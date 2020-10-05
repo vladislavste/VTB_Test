@@ -1,5 +1,7 @@
 import json
+from html import escape
 from json.decoder import JSONDecodeError
+import re
 
 
 class Converter:
@@ -39,11 +41,16 @@ class Converter:
         html_str = ''
 
         for key, value in json_dict.items():
+
+            open_tag, close_tag = self.parse_css_selectors(key)
+
             if isinstance(value, list):
                 value = self.html_list_creator(value)
-                html_str += f'<{key}>{value}</{key}>'
+                html_str += f'<{open_tag}>{value}</{close_tag}>'
             else:
-                html_str += f'<{key}>{value}</{key}>'
+                value = escape(value)
+                html_str += f'<{open_tag}>{value}</{close_tag}>'
+
         return html_str
 
     def html_list_creator(self, data) -> str:
@@ -52,6 +59,36 @@ class Converter:
         for json_dict in data:
             html_data += '<li>{}</li>'.format(self.dict_to_str(json_dict))
         return '<ul>{}</ul>'.format(html_data)
+
+    def parse_css_selectors(self, key) -> tuple:
+        """ Парсим селекторы и возвращаем кортеж из открытого и закрытого HTML тэга """
+        parse_tag = re.findall(r'^[^#\.]+', key)
+        parse_id = re.findall(r'#([a-zA-Z0-9]+)', key)
+        parse_class = re.findall(r'\.([a-zA-Z0-9]+)', key)
+
+        if parse_tag:
+            css_tag = ''.join(parse_tag)
+        else:
+            print(f'Tag name is missing in "{key}"')
+            css_tag = ''
+
+        if parse_class:
+            css_class = ' class="{}"'.format(' '.join(parse_class))
+        else:
+            css_class = ''
+
+        if parse_id:
+            if len(parse_id) > 1:
+                print(f'The number of id in "{key}" is greater than 1, I will use the first one for layout')
+                css_id = ' id="{}"'.format(parse_id[0])
+            else:
+                css_id = ' id="{}"'.format(''.join(parse_id))
+        else:
+            css_id = ''
+
+        opening_tag = css_tag + css_id + css_class
+
+        return opening_tag, css_tag
 
 
 if __name__ == '__main__':

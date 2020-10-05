@@ -34,6 +34,12 @@ class TestConverter(unittest.TestCase):
         self.assertEqual(result,
                          '<ul><li><span>span 1</span><content><ul><li><p>p 1</p><header>header 1</header></li></ul></content></li><li><div>div 1</div></li></ul>')
 
+    def test_css_selectors(self):
+        input_data = 'p.class1.class2.class3.class4#id'
+        result = self.converter.parse_css_selectors(input_data)
+        self.assertEqual(result,
+                         ('p id="id" class="class1 class2 class3 class4"', 'p'))
+
 
 if __name__ == "__main__":
     unittest.main()
