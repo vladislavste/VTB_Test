@@ -26,7 +26,12 @@ class Converter:
     def converter(self, json_data) -> None:
         """ Записываем новые данные в HTML"""
         with open('index.html', 'w+') as html_file:
-            html_data = ''.join(map(self.dict_to_str, json_data))
+
+            if isinstance(json_data, list):
+                html_data = self.html_list_creator(json_data)
+            else:
+                html_data = ''.join(self.dict_to_str(json_data))
+
             html_file.write(html_data)
 
     def dict_to_str(self, json_dict) -> str:
@@ -36,6 +41,14 @@ class Converter:
             html_str += f'<{key}>{value}</{key}>'
 
         return html_str
+
+    def html_list_creator(self, data):
+        """ Создадим список HTML """
+        html_data = ''
+        for json_dict in data:
+            html_data += '<li>{}</li>'.format(self.dict_to_str(json_dict))
+
+        return '<ul>{}</ul>'.format(html_data)
 
 
 if __name__ == '__main__':
