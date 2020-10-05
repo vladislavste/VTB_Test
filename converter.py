@@ -37,17 +37,20 @@ class Converter:
     def dict_to_str(self, json_dict) -> str:
         """ Преобразуем json_dict в строку с HTML тегами"""
         html_str = ''
-        for key, value in json_dict.items():
-            html_str += f'<{key}>{value}</{key}>'
 
+        for key, value in json_dict.items():
+            if isinstance(value, list):
+                value = self.html_list_creator(value)
+                html_str += f'<{key}>{value}</{key}>'
+            else:
+                html_str += f'<{key}>{value}</{key}>'
         return html_str
 
-    def html_list_creator(self, data):
+    def html_list_creator(self, data) -> str:
         """ Создадим список HTML """
         html_data = ''
         for json_dict in data:
             html_data += '<li>{}</li>'.format(self.dict_to_str(json_dict))
-
         return '<ul>{}</ul>'.format(html_data)
 
 
