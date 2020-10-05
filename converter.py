@@ -25,26 +25,15 @@ class Converter:
 
     def converter(self, json_data) -> None:
         """ Записываем новые данные в HTML"""
-
-        with open(self.output_file, 'w+') as html_file:
+        with open('index.html', 'w+') as html_file:
             html_data = ''.join(map(self.dict_to_str, json_data))
             html_file.write(html_data)
 
     def dict_to_str(self, json_dict) -> str:
         """ Преобразуем json_dict в строку с HTML тегами"""
-
         html_str = ''
-        try:
-            title = json_dict['title']
-            html_str += f'<h1>{title}</h1>'
-        except KeyError:
-            print('Key "title" was not found')
-
-        try:
-            paragraph = json_dict['body']
-            html_str += f'<p>{paragraph}</p>'
-        except KeyError:
-            print('Key "body" was not found')
+        for key, value in json_dict.items():
+            html_str += f'<{key}>{value}</{key}>'
 
         return html_str
 
